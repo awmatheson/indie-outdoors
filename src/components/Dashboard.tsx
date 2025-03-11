@@ -17,7 +17,7 @@ const Dashboard = () => {
     const fetchData = async () => {
       try {
         // Replace this URL with your actual CSV file URL from GitHub
-        const response = await axios.get('');
+        const response = await axios.get('https://raw.githubusercontent.com/awmatheson/indie-outdoors/refs/heads/main/companies.csv');
         const parsedData = d3.csvParse(response.data);
         setData(parsedData);
       } catch (err) {
