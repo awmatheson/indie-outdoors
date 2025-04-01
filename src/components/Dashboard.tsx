@@ -35,7 +35,6 @@ const Dashboard = () => {
   const [error, setError] = useState<string | null>(null);
   const [searchTerm, setSearchTerm] = useState('');
   const [filters, setFilters] = useState<FilterState>({});
-  const [simulation, setSimulation] = useState<d3.Simulation<Node, Link> | null>(null);
 
   useEffect(() => {
     const fetchData = async () => {
@@ -173,8 +172,6 @@ const Dashboard = () => {
       .force('link', d3.forceLink<Node, Link>(links).id(d => d.id))
       .force('charge', d3.forceManyBody().strength(-100))
       .force('center', d3.forceCenter(width / 2, height / 2));
-
-    setSimulation(newSimulation);
 
     // Add links
     const link = g.append('g')
