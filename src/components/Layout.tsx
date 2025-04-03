@@ -1,4 +1,4 @@
-import { AppBar, Box, Container, CssBaseline, Toolbar, Typography, createTheme, ThemeProvider } from '@mui/material';
+import { AppBar, Box, CssBaseline, Toolbar, Typography, createTheme, ThemeProvider } from '@mui/material';
 import { Outlet } from 'react-router-dom';
 
 // Create theme with indie outdoors colors
