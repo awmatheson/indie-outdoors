@@ -1,7 +1,79 @@
 import { useEffect, useState } from 'react';
-import { Box, Grid, Paper, Typography, CircularProgress, TextField, Select, MenuItem, FormControl, InputLabel, Stack, Slider } from '@mui/material';
+import { Box, Grid, Paper, Typography, CircularProgress, TextField, Select, MenuItem, FormControl, InputLabel, Stack, Slider, createTheme, ThemeProvider } from '@mui/material';
 import axios from 'axios';
 import * as d3 from 'd3';
+
+// Create theme with indie outdoors colors
+const theme = createTheme({
+  typography: {
+    fontFamily: '"Work Sans", sans-serif',
+    h1: {
+      fontWeight: 700,
+      letterSpacing: '0.02em',
+    },
+    h5: {
+      fontWeight: 600,
+      letterSpacing: '0.02em',
+    },
+    h6: {
+      fontWeight: 600,
+      letterSpacing: '0.02em',
+    },
+  },
+  palette: {
+    primary: {
+      main: '#C75C2C', // Terracotta orange
+    },
+    secondary: {
+      main: '#2A5B5B', // Teal/forest green
+    },
+    background: {
+      default: '#FAF6F1', // Light cream background
+      paper: '#FFFFFF',
+    },
+  },
+  components: {
+    MuiPaper: {
+      styleOverrides: {
+        root: {
+          borderRadius: 12,
+          border: '2px solid #2A2A2A',
+          boxShadow: '4px 4px 0px #2A2A2A',
+        },
+      },
+    },
+    MuiTextField: {
+      styleOverrides: {
+        root: {
+          '& .MuiOutlinedInput-root': {
+            borderRadius: 8,
+            '& fieldset': {
+              borderColor: '#2A2A2A',
+              borderWidth: 2,
+            },
+            '&:hover fieldset': {
+              borderColor: '#C75C2C',
+            },
+          },
+        },
+      },
+    },
+    MuiSelect: {
+      styleOverrides: {
+        root: {
+          borderRadius: 8,
+          '& .MuiOutlinedInput-notchedOutline': {
+            borderColor: '#2A2A2A',
+            borderWidth: 2,
+          },
+          '&:hover .MuiOutlinedInput-notchedOutline': {
+            borderColor: '#C75C2C',
+          },
+        },
+      },
+    },
+  },
+});
 
 interface CompanyData {
   Company: string;
@@ -120,13 +192,20 @@ const Dashboard = () => {
     // Clear any existing SVG
     d3.select('#network-graph').selectAll('*').remove();
 
-    const width = 600;
-    const height = 400;
+    // Get container dimensions
+    const container = document.getElementById('network-graph');
+    if (!container) return;
+
+    const width = container.clientWidth;
+    const height = container.clientHeight;
 
     const svg = d3.select('#network-graph')
       .append('svg')
-      .attr('width', width)
-      .attr('height', height);
+      .attr('width', '100%')
+      .attr('height', '100%')
+      .attr('viewBox', `0 0 ${width} ${height}`)
+      .attr('preserveAspectRatio', 'xMidYMid meet')
+      .style('background-color', '#FAF6F1');
 
     // Add zoom behavior
     const g = svg.append('g');
@@ -167,10 +246,10 @@ const Dashboard = () => {
       });
     });
 
-    // Create force simulation
+    // Create force simulation with responsive forces
     const newSimulation = d3.forceSimulation<Node>(nodes)
       .force('link', d3.forceLink<Node, Link>(links).id(d => d.id))
-      .force('charge', d3.forceManyBody().strength(-100))
+      .force('charge', d3.forceManyBody().strength(-width * 0.25)) // Responsive charge
       .force('center', d3.forceCenter(width / 2, height / 2));
 
     // Add links
@@ -178,26 +257,32 @@ const Dashboard = () => {
       .selectAll('line')
       .data(links)
       .join('line')
-      .attr('stroke', '#999')
-      .attr('stroke-opacity', 0.6);
+      .attr('stroke', '#2A2A2A')
+      .attr('stroke-opacity', 0.6)
+      .attr('stroke-width', 2);
 
-    // Add nodes
+    // Add nodes with responsive sizes
+    const nodeRadius = Math.min(width, height) * 0.015; // Responsive node size
     const node = g.append('g')
       .selectAll('circle')
       .data(nodes)
       .join('circle')
       .attr('r', d => {
         const isHighlighted = searchTerm && d.id.toLowerCase().includes(searchTerm.toLowerCase());
-        return isHighlighted ? 8 : 5;  // Make highlighted nodes larger
+        return isHighlighted ? nodeRadius * 1.6 : nodeRadius;
       })
       .attr('fill', d => {
         const isHighlighted = searchTerm && d.id.toLowerCase().includes(searchTerm.toLowerCase());
-        return isHighlighted ? '#ff0000' : d3.schemeCategory10[
-          [...new Set(nodes.map(n => n.group))].indexOf(d.group)
-        ];
-      });
+        const colorScale = d3.scaleOrdinal<string>()
+          .domain([...new Set(nodes.map(n => n.group))])
+          .range(['#C75C2C', '#2A5B5B', '#F4B942']);
+        return isHighlighted ? '#C75C2C' : colorScale(d.group);
+      })
+      .attr('stroke', '#2A2A2A')
+      .attr('stroke-width', 2);
 
-    // Add labels
+    // Add labels with responsive font sizes
+    const fontSize = Math.min(width, height) * 0.02; // Responsive font size
     const labels = g.append('g')
       .selectAll('text')
       .data(nodes)
@@ -205,14 +290,15 @@ const Dashboard = () => {
       .text(d => d.id)
       .attr('font-size', d => {
         const isHighlighted = searchTerm && d.id.toLowerCase().includes(searchTerm.toLowerCase());
-        return isHighlighted ? '10px' : '8px';
+        return isHighlighted ? `${fontSize * 1.25}px` : `${fontSize}px`;
       })
       .attr('font-weight', d => {
         const isHighlighted = searchTerm && d.id.toLowerCase().includes(searchTerm.toLowerCase());
         return isHighlighted ? 'bold' : 'normal';
       })
-      .attr('dx', 8)
-      .attr('dy', 3);
+      .attr('fill', '#2A2A2A')
+      .attr('dx', nodeRadius * 1.5)
+      .attr('dy', nodeRadius * 0.5);
 
     // Update positions on simulation tick
     newSimulation.on('tick', () => {
@@ -250,12 +336,31 @@ const Dashboard = () => {
         svg.transition().duration(750).call(zoom.transform, transform);
       }
     }
+
+    // Add resize handler
+    const handleResize = () => {
+      if (!container) return;
+      const newWidth = container.clientWidth;
+      const newHeight = container.clientHeight;
+      
+      svg.attr('viewBox', `0 0 ${newWidth} ${newHeight}`);
+      newSimulation.force('center', d3.forceCenter(newWidth / 2, newHeight / 2));
+      newSimulation.alpha(0.3).restart();
+    };
+
+    window.addEventListener('resize', handleResize);
+
+    // Cleanup
+    return () => {
+      window.removeEventListener('resize', handleResize);
+      newSimulation.stop();
+    };
   };
 
   if (loading) {
     return (
       <Box sx={{ display: 'flex', justifyContent: 'center', p: 3 }}>
-        <CircularProgress />
+        <CircularProgress sx={{ color: '#C75C2C' }} />
       </Box>
     );
   }
@@ -263,127 +368,235 @@ const Dashboard = () => {
   if (error) {
     return (
       <Box sx={{ p: 3 }}>
-        <Typography color="error">{error}</Typography>
+        <Typography color="#C75C2C">{error}</Typography>
       </Box>
     );
   }
 
   return (
-    <Grid container spacing={3}>
-      <Grid item xs={12}>
-        <Paper sx={{ p: 2 }}>
-          <Stack spacing={2}>
-            <TextField
-              fullWidth
-              label="Search Companies"
-              variant="outlined"
-              value={searchTerm}
-              onChange={handleSearch}
-            />
-            <Grid container spacing={2}>
-              {Object.keys(data[0]).map((column) => (
-                <Grid item xs={12} sm={6} md={4} key={column}>
-                  {column === 'Year Founded' ? (
-                    <Box sx={{ width: '100%', px: 2 }}>
-                      <Typography gutterBottom>
-                        Year Founded
-                      </Typography>
-                      <Slider
-                        value={filters[column] as number[] || getYearRange()}
-                        onChange={(_, newValue) => handleFilterChange(column, newValue as number[])}
-                        valueLabelDisplay="auto"
-                        min={getYearRange()[0]}
-                        max={getYearRange()[1]}
-                        marks={[
-                          { value: getYearRange()[0], label: getYearRange()[0].toString() },
-                          { value: getYearRange()[1], label: getYearRange()[1].toString() }
-                        ]}
-                      />
-                      <Box sx={{ display: 'flex', justifyContent: 'space-between', mt: 1 }}>
-                        <Typography variant="caption">
-                          {filters[column] ? (filters[column] as number[])[0] : getYearRange()[0]}
-                        </Typography>
-                        <Typography variant="caption">
-                          {filters[column] ? (filters[column] as number[])[1] : getYearRange()[1]}
-                        </Typography>
-                      </Box>
-                    </Box>
-                  ) : (
-                    <FormControl fullWidth>
-                      <InputLabel>{column}</InputLabel>
-                      <Select
-                        value={filters[column] || ''}
-                        label={column}
-                        onChange={(e) => handleFilterChange(column, e.target.value)}
-                      >
-                        <MenuItem value="">All</MenuItem>
-                        {getUniqueValues(column as keyof CompanyData).map((value) => (
-                          <MenuItem key={value} value={value}>
-                            {value}
-                          </MenuItem>
-                        ))}
-                      </Select>
-                    </FormControl>
-                  )}
+    <ThemeProvider theme={theme}>
+      <Box sx={{ bgcolor: 'background.default', minHeight: '100vh', p: 3 }}>
+        <Typography 
+          variant="h1" 
+          align="center" 
+          sx={{ 
+            mb: 4, 
+            color: '#2A2A2A',
+            fontSize: '2.5rem',
+            textTransform: 'uppercase',
+            letterSpacing: '0.05em',
+            fontWeight: 700,
+          }}
+        >
+          Indie Outdoors
+        </Typography>
+        <Grid container spacing={{ xs: 2, sm: 3 }}>
+          <Grid item xs={12}>
+            <Paper 
+              sx={{ 
+                p: { xs: 2, sm: 3 },
+                bgcolor: '#FFFFFF',
+                borderRadius: { xs: 2, sm: 3 },
+                border: '2px solid #2A2A2A',
+                boxShadow: '4px 4px 0px #2A2A2A',
+              }}
+            >
+              <Stack spacing={{ xs: 2, sm: 3 }}>
+                <TextField
+                  fullWidth
+                  label="Search Companies"
+                  variant="outlined"
+                  value={searchTerm}
+                  onChange={handleSearch}
+                  sx={{
+                    '& .MuiOutlinedInput-root': {
+                      borderRadius: { xs: 1, sm: 2 },
+                      '& fieldset': {
+                        borderColor: '#2A2A2A',
+                        borderWidth: 2,
+                      },
+                      '&:hover fieldset': {
+                        borderColor: '#C75C2C',
+                      },
+                    },
+                    '& .MuiInputLabel-root': {
+                      color: '#2A2A2A',
+                    },
+                  }}
+                />
+                <Grid container spacing={{ xs: 2, sm: 3 }}>
+                  {Object.keys(data[0]).map((column) => (
+                    <Grid item xs={12} sm={6} md={4} key={column}>
+                      {column === 'Year Founded' ? (
+                        <Box sx={{ width: '100%', px: { xs: 1, sm: 2 } }}>
+                          <Typography gutterBottom sx={{ color: '#2A2A2A', fontWeight: 600 }}>
+                            Year Founded
+                          </Typography>
+                          <Slider
+                            value={filters[column] as number[] || getYearRange()}
+                            onChange={(_, newValue) => handleFilterChange(column, newValue as number[])}
+                            valueLabelDisplay="auto"
+                            min={getYearRange()[0]}
+                            max={getYearRange()[1]}
+                            sx={{
+                              '& .MuiSlider-thumb': {
+                                borderColor: '#2A2A2A',
+                                bgcolor: '#F4B942',
+                              },
+                              '& .MuiSlider-track': {
+                                backgroundColor: '#C75C2C',
+                              },
+                              '& .MuiSlider-rail': {
+                                backgroundColor: '#2A5B5B',
+                              },
+                            }}
+                            marks={[
+                              { value: getYearRange()[0], label: getYearRange()[0].toString() },
+                              { value: getYearRange()[1], label: getYearRange()[1].toString() }
+                            ]}
+                          />
+                        </Box>
+                      ) : (
+                        <FormControl fullWidth>
+                          <InputLabel sx={{ color: '#2A2A2A' }}>{column}</InputLabel>
+                          <Select
+                            value={filters[column] || ''}
+                            label={column}
+                            onChange={(e) => handleFilterChange(column, e.target.value)}
+                            sx={{
+                              borderRadius: { xs: 1, sm: 2 },
+                              '& .MuiOutlinedInput-notchedOutline': {
+                                borderColor: '#2A2A2A',
+                                borderWidth: 2,
+                              },
+                              '&:hover .MuiOutlinedInput-notchedOutline': {
+                                borderColor: '#C75C2C',
+                              },
+                            }}
+                          >
+                            <MenuItem value="">All</MenuItem>
+                            {getUniqueValues(column as keyof CompanyData).map((value) => (
+                              <MenuItem key={value} value={value}>
+                                {value}
+                              </MenuItem>
+                            ))}
+                          </Select>
+                        </FormControl>
+                      )}
+                    </Grid>
+                  ))}
                 </Grid>
-              ))}
-            </Grid>
-          </Stack>
-        </Paper>
-      </Grid>
-      <Grid item xs={12}>
-        <Paper sx={{ p: 2 }}>
-          <Typography variant="h5" gutterBottom>
-            Company Relationships Overview
-          </Typography>
-          <Box id="network-graph" sx={{ width: '100%', height: '400px' }} />
-        </Paper>
-      </Grid>
-      <Grid item xs={12} md={6}>
-        <Paper sx={{ p: 2 }}>
-          <Typography variant="h6" gutterBottom>
-            Company Details
-          </Typography>
-          <Box sx={{ maxHeight: 400, overflow: 'auto' }}>
-            {filteredData.map((company) => (
-              <Box key={company.Company} sx={{ mb: 2 }}>
-                <Typography variant="subtitle1" fontWeight="bold">
-                  {company.Company}
-                </Typography>
-                <Typography variant="body2">
-                  Main Focus: {company['Main Sport Focus']}
-                </Typography>
-                <Typography variant="body2">
-                  Founded: {company['Year Founded']}
-                </Typography>
-                <Typography variant="body2">
-                  Headquarters: {company.Headquarters}
-                </Typography>
+              </Stack>
+            </Paper>
+          </Grid>
+          <Grid item xs={12}>
+            <Paper 
+              sx={{ 
+                p: { xs: 2, sm: 3 },
+                bgcolor: '#FFFFFF',
+                borderRadius: { xs: 2, sm: 3 },
+                border: '2px solid #2A2A2A',
+                boxShadow: '4px 4px 0px #2A2A2A',
+              }}
+            >
+              <Typography variant="h5" gutterBottom sx={{ color: '#2A2A2A', fontWeight: 'bold', letterSpacing: '0.02em' }}>
+                Company Relationships Overview
+              </Typography>
+              <Box 
+                id="network-graph" 
+                sx={{ 
+                  width: '100%',
+                  height: { xs: '50vh', sm: '60vh' },
+                  bgcolor: '#FAF6F1', 
+                  borderRadius: { xs: 1, sm: 2 },
+                  overflow: 'hidden'
+                }} 
+              />
+            </Paper>
+          </Grid>
+          <Grid item xs={12} md={6}>
+            <Paper 
+              sx={{ 
+                p: { xs: 2, sm: 3 },
+                bgcolor: '#FFFFFF',
+                borderRadius: { xs: 2, sm: 3 },
+                border: '2px solid #2A2A2A',
+                boxShadow: '4px 4px 0px #2A2A2A',
+              }}
+            >
+              <Typography variant="h6" gutterBottom sx={{ color: '#2A2A2A', fontWeight: 'bold', letterSpacing: '0.02em' }}>
+                Company Details
+              </Typography>
+              <Box sx={{ maxHeight: { xs: 300, sm: 400 }, overflow: 'auto' }}>
+                {filteredData.map((company) => (
+                  <Box 
+                    key={company.Company} 
+                    sx={{ 
+                      mb: 2, 
+                      p: { xs: 1.5, sm: 2 }, 
+                      borderLeft: 4, 
+                      borderColor: '#C75C2C',
+                      bgcolor: '#FAF6F1',
+                      borderRadius: { xs: 0.5, sm: 1 },
+                    }}
+                  >
+                    <Typography variant="subtitle1" fontWeight="bold" color="#2A2A2A">
+                      {company.Company}
+                    </Typography>
+                    <Typography variant="body2" color="#2A5B5B">
+                      Main Focus: {company['Main Sport Focus']}
+                    </Typography>
+                    <Typography variant="body2" color="#2A5B5B">
+                      Founded: {company['Year Founded']}
+                    </Typography>
+                    <Typography variant="body2" color="#2A5B5B">
+                      Headquarters: {company.Headquarters}
+                    </Typography>
+                  </Box>
+                ))}
               </Box>
-            ))}
-          </Box>
-        </Paper>
-      </Grid>
-      <Grid item xs={12} md={6}>
-        <Paper sx={{ p: 2 }}>
-          <Typography variant="h6" gutterBottom>
-            Environmental Impact
-          </Typography>
-          <Box sx={{ maxHeight: 400, overflow: 'auto' }}>
-            {filteredData.map((company) => (
-              <Box key={company.Company} sx={{ mb: 2 }}>
-                <Typography variant="subtitle1" fontWeight="bold">
-                  {company.Company}
-                </Typography>
-                <Typography variant="body2">
-                  {company['Environmental & Sustainability Policies']}
-                </Typography>
+            </Paper>
+          </Grid>
+          <Grid item xs={12} md={6}>
+            <Paper 
+              sx={{ 
+                p: { xs: 2, sm: 3 },
+                bgcolor: '#FFFFFF',
+                borderRadius: { xs: 2, sm: 3 },
+                border: '2px solid #2A2A2A',
+                boxShadow: '4px 4px 0px #2A2A2A',
+              }}
+            >
+              <Typography variant="h6" gutterBottom sx={{ color: '#2A2A2A', fontWeight: 'bold', letterSpacing: '0.02em' }}>
+                Environmental Impact
+              </Typography>
+              <Box sx={{ maxHeight: { xs: 300, sm: 400 }, overflow: 'auto' }}>
+                {filteredData.map((company) => (
+                  <Box 
+                    key={company.Company} 
+                    sx={{ 
+                      mb: 2, 
+                      p: { xs: 1.5, sm: 2 }, 
+                      borderLeft: 4, 
+                      borderColor: '#2A5B5B',
+                      bgcolor: '#FAF6F1',
+                      borderRadius: { xs: 0.5, sm: 1 },
+                    }}
+                  >
+                    <Typography variant="subtitle1" fontWeight="bold" color="#2A2A2A">
+                      {company.Company}
+                    </Typography>
+                    <Typography variant="body2" color="#2A5B5B">
+                      {company['Environmental & Sustainability Policies']}
+                    </Typography>
+                  </Box>
+                ))}
               </Box>
-            ))}
-          </Box>
-        </Paper>
-      </Grid>
-    </Grid>
+            </Paper>
+          </Grid>
+        </Grid>
+      </Box>
+    </ThemeProvider>
   );
 };
 
