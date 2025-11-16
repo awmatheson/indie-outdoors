@@ -528,9 +528,9 @@ const Dashboard = () => {
                 Company Details
               </Typography>
               <Box sx={{ maxHeight: { xs: 300, sm: 400 }, overflow: 'auto' }}>
-                {filteredData.map((company) => (
+                {filteredData.map((company, index) => (
                   <Box 
-                    key={company.Company} 
+                    key={`${company.Company}-details-${index}`} 
                     sx={{ 
                       mb: 2, 
                       p: { xs: 1.5, sm: 2 }, 
@@ -571,9 +571,9 @@ const Dashboard = () => {
                 Environmental Impact
               </Typography>
               <Box sx={{ maxHeight: { xs: 300, sm: 400 }, overflow: 'auto' }}>
-                {filteredData.map((company) => (
+                {filteredData.map((company, index) => (
                   <Box 
-                    key={company.Company} 
+                    key={`${company.Company}-env-${index}`}
                     sx={{ 
                       mb: 2, 
                       p: { xs: 1.5, sm: 2 }, 

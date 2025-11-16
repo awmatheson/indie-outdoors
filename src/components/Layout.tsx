@@ -1,5 +1,6 @@
-import { AppBar, Box, CssBaseline, Toolbar, Typography, createTheme, ThemeProvider } from '@mui/material';
-import { Outlet } from 'react-router-dom';
+import { AppBar, Box, CssBaseline, Toolbar, Typography, Tabs, Tab, createTheme, ThemeProvider } from '@mui/material';
+import { Outlet, Link, useLocation } from 'react-router-dom';
+import { useState, useEffect } from 'react';
 
 // Create theme with indie outdoors colors
 const theme = createTheme({
@@ -55,8 +56,10 @@ const theme = createTheme({
           boxShadow: 'none',
           borderBottom: '2px solid #2A2A2A',
           width: '100%',
+          maxWidth: '100%',
           left: 0,
           right: 0,
+          position: 'static',
         },
       },
     },
@@ -64,6 +67,10 @@ const theme = createTheme({
       styleOverrides: {
         root: {
           minHeight: '56px', // Smaller height on mobile
+          width: '100%',
+          maxWidth: '100%',
+          minWidth: '100%',
+          boxSizing: 'border-box',
           '@media (min-width:600px)': {
             minHeight: '64px',
           },
@@ -88,6 +95,22 @@ const theme = createTheme({
 });
 
 const Layout = () => {
+  const location = useLocation();
+  const [tabValue, setTabValue] = useState(0);
+
+  useEffect(() => {
+    // Set active tab based on current route
+    if (location.pathname === '/' || location.pathname === '/indie-outdoors' || location.pathname === '/indie-outdoors/') {
+      setTabValue(0);
+    } else if (location.pathname.startsWith('/blog') || location.pathname.startsWith('/indie-outdoors/blog')) {
+      setTabValue(1);
+    }
+  }, [location]);
+
+  const handleTabChange = (_event: React.SyntheticEvent, newValue: number) => {
+    setTabValue(newValue);
+  };
+
   return (
     <ThemeProvider theme={theme}>
       <Box sx={{ 
@@ -96,36 +119,95 @@ const Layout = () => {
         minHeight: '100vh',
         bgcolor: 'background.default',
         width: '100%',
+        maxWidth: '100%',
+        minWidth: '100%',
+        margin: 0,
+        padding: 0,
         overflow: 'hidden', // Prevent horizontal scrolling
+        boxSizing: 'border-box',
       }}>
         <CssBaseline />
-        <AppBar position="static" sx={{ width: '100%' }}>
+        <AppBar 
+          position="static" 
+          sx={{ 
+            width: '100%',
+            maxWidth: '100%',
+            left: 0,
+            right: 0,
+          }}
+        >
           <Toolbar 
             disableGutters 
             sx={{ 
               px: { xs: 2, sm: 3, md: 4 },
               width: '100%',
               maxWidth: '100%',
+              minWidth: '100%',
+              flexDirection: 'column',
+              boxSizing: 'border-box',
             }}
           >
             <Typography 
               variant="h1" 
-              component="h1" 
+              component={Link}
+              to="/"
               sx={{ 
-                flexGrow: 1,
                 color: '#FFFFFF',
                 textTransform: 'uppercase',
                 letterSpacing: '0.05em',
                 fontWeight: 700,
                 textAlign: 'center',
                 fontFamily: '"Outfit", sans-serif',
-                whiteSpace: 'nowrap', // Prevent text wrapping
+                whiteSpace: 'nowrap',
                 overflow: 'hidden',
-                textOverflow: 'ellipsis', // Show ellipsis if text overflows
+                textOverflow: 'ellipsis',
+                textDecoration: 'none',
+                mb: { xs: 1, sm: 1.5 },
+                '&:hover': {
+                  opacity: 0.9,
+                },
               }}
             >
               Indie Outdoors
             </Typography>
+            <Tabs
+              value={tabValue}
+              onChange={handleTabChange}
+              sx={{
+                width: '100%',
+                '& .MuiTab-root': {
+                  color: '#FFFFFF',
+                  fontWeight: 600,
+                  textTransform: 'none',
+                  fontSize: { xs: '0.875rem', sm: '1rem' },
+                  minHeight: { xs: '40px', sm: '48px' },
+                  '&.Mui-selected': {
+                    color: '#FFFFFF',
+                  },
+                },
+                '& .MuiTabs-indicator': {
+                  backgroundColor: '#FFFFFF',
+                  height: 3,
+                },
+              }}
+            >
+              <Tab 
+                label="Dashboard" 
+                component={Link} 
+                to="/"
+                sx={{ 
+                  color: tabValue === 0 ? '#FFFFFF' : 'rgba(255, 255, 255, 0.7)',
+                }}
+              />
+              <Tab 
+                label="Blog" 
+                component={Link} 
+                to="/blog"
+                sx={{ 
+                  color: tabValue === 1 ? '#FFFFFF' : 'rgba(255, 255, 255, 0.7)',
+                }}
+              />
+            </Tabs>
           </Toolbar>
         </AppBar>
         <Box 
