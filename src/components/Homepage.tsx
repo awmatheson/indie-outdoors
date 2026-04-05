@@ -1,7 +1,8 @@
 import { Box, Container, Typography, Grid } from '@mui/material';
+import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
-import { getAllPosts } from '../utils/blogUtils';
 import { colors, fonts, getOwnershipColor, getOwnershipLabel, slugify } from '../theme';
+import { fetchSubstackPosts, SUBSTACK_BASE_URL, type SubstackPost } from '../utils/substackUtils';
 
 // Hand-picked featured companies for the homepage
 const FEATURED_COMPANIES = [
@@ -86,7 +87,11 @@ const STATS = [
 ];
 
 export default function Homepage() {
-  const recentPosts = getAllPosts().slice(0, 3);
+  const [recentPosts, setRecentPosts] = useState<SubstackPost[]>([]);
+
+  useEffect(() => {
+    fetchSubstackPosts(3).then(setRecentPosts).catch(() => setRecentPosts([]));
+  }, []);
 
   return (
     <Box>
@@ -511,17 +516,19 @@ export default function Homepage() {
                   Latest dispatches
                 </Typography>
               </Box>
-              <Box component={Link} to="/blog" sx={{ fontFamily: fonts.sans, fontSize: '0.9rem', fontWeight: 600, color: colors.trail, textDecoration: 'none', '&:hover': { textDecoration: 'underline' } }}>
+              <Box component="a" href={SUBSTACK_BASE_URL} target="_blank" rel="noopener noreferrer" sx={{ fontFamily: fonts.sans, fontSize: '0.9rem', fontWeight: 600, color: colors.trail, textDecoration: 'none', '&:hover': { textDecoration: 'underline' } }}>
                 All posts →
               </Box>
             </Box>
 
             <Grid container spacing={3}>
               {recentPosts.map((post) => (
-                <Grid item xs={12} md={4} key={post.slug}>
+                <Grid item xs={12} md={4} key={post.id}>
                   <Box
-                    component={Link}
-                    to={`/blog/${post.slug}`}
+                    component="a"
+                    href={`${post.url}?utm_source=indie-outdoors`}
+                    target="_blank"
+                    rel="noopener noreferrer"
                     sx={{
                       display: 'block',
                       bgcolor: '#FFFFFF',
@@ -538,7 +545,7 @@ export default function Homepage() {
                     }}
                   >
                     <Typography sx={{ fontFamily: fonts.mono, fontSize: '0.6875rem', letterSpacing: '0.08em', color: colors.textSecondary, mb: 2 }}>
-                      {new Date(post.date).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })} · {post.author}
+                      {post.post_date ? new Date(post.post_date).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' }) : ''}
                     </Typography>
                     <Typography
                       variant="h3"
@@ -552,10 +559,10 @@ export default function Homepage() {
                       {post.title}
                     </Typography>
                     <Typography sx={{ fontSize: '0.9rem', color: colors.textSecondary, lineHeight: 1.65, display: '-webkit-box', WebkitLineClamp: 3, WebkitBoxOrient: 'vertical', overflow: 'hidden' }}>
-                      {post.excerpt}
+                      {post.subtitle || post.description}
                     </Typography>
                     <Typography sx={{ mt: 2, fontFamily: fonts.sans, fontSize: '0.875rem', fontWeight: 600, color: colors.trail }}>
-                      Read more →
+                      Read on Substack →
                     </Typography>
                   </Box>
                 </Grid>

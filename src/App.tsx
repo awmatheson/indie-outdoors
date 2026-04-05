@@ -7,7 +7,6 @@ import Directory from './components/Directory';
 import CompanyProfile from './components/CompanyProfile';
 import OwnershipMap from './components/OwnershipMap';
 import Blog from './components/Blog';
-import BlogPost from './components/BlogPost';
 import About from './components/About';
 import Submit from './components/Submit';
 
@@ -22,11 +21,11 @@ function App() {
             <Route path="directory/:slug" element={<CompanyProfile />} />
             <Route path="ownership-map" element={<OwnershipMap />} />
             <Route path="blog" element={<Blog />} />
-            <Route path="blog/:slug" element={<BlogPost />} />
             <Route path="about" element={<About />} />
             <Route path="submit" element={<Submit />} />
-            {/* Legacy redirect from old dashboard route */}
+            {/* Legacy redirects */}
             <Route path="dashboard" element={<Navigate to="/directory" replace />} />
+            <Route path="blog/:slug" element={<Navigate to="/blog" replace />} />
           </Route>
         </Routes>
       </BrowserRouter>
