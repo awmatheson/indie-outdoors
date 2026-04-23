@@ -5,6 +5,7 @@ import theme, { colors, fonts } from '../theme';
 const NAV_LINKS = [
   { label: 'Discover', to: '/' },
   { label: 'Directory', to: '/directory' },
+  { label: 'Map', to: '/ownership-map' },
   { label: 'Stories', to: '/blog' },
   { label: 'About', to: '/about' },
 ];
@@ -96,7 +97,7 @@ const Layout = () => {
 
               {/* Mobile nav */}
               <Box sx={{ display: { xs: 'flex', md: 'none' }, gap: 2, alignItems: 'center' }}>
-                {[NAV_LINKS[1], NAV_LINKS[2], NAV_LINKS[3]].map(({ label, to }) => (
+                {[NAV_LINKS[1], NAV_LINKS[2], NAV_LINKS[3], NAV_LINKS[4]].map(({ label, to }) => (
                   <Box
                     key={to}
                     component={Link}
