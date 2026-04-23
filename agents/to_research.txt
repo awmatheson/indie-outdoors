@@ -1,0 +1,18 @@
+# Companies to research — one per line
+# Run: python agents/research_agent.py --batch agents/to_research.txt
+
+Hyperlite Mountain Gear
+Mystery Ranch
+Enlightened Equipment
+Tenkara USA
+Vissla
+Kona Bicycles
+Devinci Bicycles
+Metolius Climbing
+Trango
+Pa'lante Packs
+Atom Packs
+Katabatic Gear
+Nunatak
+Revel Bikes
+Outdoor Research Collective

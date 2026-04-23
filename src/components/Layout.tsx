@@ -3,9 +3,9 @@ import { Outlet, Link, useLocation } from 'react-router-dom';
 import theme, { colors, fonts } from '../theme';
 
 const NAV_LINKS = [
+  { label: 'Discover', to: '/' },
   { label: 'Directory', to: '/directory' },
-  { label: 'Ownership Map', to: '/ownership-map' },
-  { label: 'Blog', to: '/blog' },
+  { label: 'Stories', to: '/blog' },
   { label: 'About', to: '/about' },
 ];
 
@@ -13,6 +13,7 @@ const Layout = () => {
   const location = useLocation();
 
   const isActive = (to: string) => {
+    if (to === '/') return location.pathname === '/';
     if (to === '/directory') return location.pathname.startsWith('/directory');
     return location.pathname === to || location.pathname.startsWith(to + '/');
   };
@@ -20,15 +21,7 @@ const Layout = () => {
   return (
     <ThemeProvider theme={theme}>
       <CssBaseline />
-      <Box
-        sx={{
-          display: 'flex',
-          flexDirection: 'column',
-          minHeight: '100vh',
-          bgcolor: colors.bg,
-          width: '100%',
-        }}
-      >
+      <Box sx={{ display: 'flex', flexDirection: 'column', minHeight: '100vh', bgcolor: colors.bg, width: '100%' }}>
         {/* Sticky Navigation */}
         <Box
           component="header"
@@ -41,26 +34,12 @@ const Layout = () => {
           }}
         >
           <Container maxWidth="xl">
-            <Box
-              sx={{
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'space-between',
-                height: { xs: 56, md: 64 },
-              }}
-            >
+            <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', height: { xs: 56, md: 64 } }}>
               {/* Logo */}
               <Box
                 component={Link}
                 to="/"
-                sx={{
-                  display: 'flex',
-                  alignItems: 'center',
-                  gap: 1.5,
-                  textDecoration: 'none',
-                  '&:hover': { opacity: 0.85 },
-                  transition: 'opacity 0.2s',
-                }}
+                sx={{ display: 'flex', alignItems: 'center', gap: 1.5, textDecoration: 'none', '&:hover': { opacity: 0.85 }, transition: 'opacity 0.2s' }}
               >
                 <Box
                   component="img"
@@ -69,29 +48,13 @@ const Layout = () => {
                   sx={{ height: 28, width: 28, filter: 'brightness(0) invert(1) opacity(0.9)' }}
                   onError={(e) => { (e.target as HTMLImageElement).style.display = 'none'; }}
                 />
-                <Typography
-                  sx={{
-                    fontFamily: fonts.serif,
-                    fontSize: { xs: '1.0625rem', md: '1.125rem' },
-                    color: '#FFFFFF',
-                    letterSpacing: '0.01em',
-                    fontStyle: 'italic',
-                    lineHeight: 1,
-                  }}
-                >
+                <Typography sx={{ fontFamily: fonts.serif, fontSize: { xs: '1.0625rem', md: '1.125rem' }, color: '#FFFFFF', letterSpacing: '0.01em', fontStyle: 'italic', lineHeight: 1 }}>
                   Indie Outdoors
                 </Typography>
               </Box>
 
-              {/* Nav Links — desktop */}
-              <Box
-                component="nav"
-                sx={{
-                  display: { xs: 'none', md: 'flex' },
-                  alignItems: 'center',
-                  gap: 0,
-                }}
-              >
+              {/* Nav — desktop */}
+              <Box component="nav" sx={{ display: { xs: 'none', md: 'flex' }, alignItems: 'center', gap: 0 }}>
                 {NAV_LINKS.map(({ label, to }) => (
                   <Box
                     key={to}
@@ -109,9 +72,7 @@ const Layout = () => {
                       transition: 'color 0.2s',
                       letterSpacing: '0.02em',
                       borderBottom: isActive(to) ? `2px solid ${colors.ridgeline}` : '2px solid transparent',
-                      '&:hover': {
-                        color: '#FFFFFF',
-                      },
+                      '&:hover': { color: '#FFFFFF' },
                     }}
                   >
                     {label}
@@ -121,63 +82,34 @@ const Layout = () => {
                   component={Link}
                   to="/directory"
                   sx={{
-                    ml: 2,
-                    px: 3,
-                    py: 0.75,
-                    bgcolor: colors.trail,
-                    color: '#FFFFFF',
-                    fontFamily: fonts.sans,
-                    fontSize: '0.875rem',
-                    fontWeight: 600,
-                    textDecoration: 'none',
-                    borderRadius: 1,
+                    ml: 2, px: 3, py: 0.75,
+                    bgcolor: colors.trail, color: '#FFFFFF',
+                    fontFamily: fonts.sans, fontSize: '0.875rem', fontWeight: 600,
+                    textDecoration: 'none', borderRadius: 1,
                     transition: 'background-color 0.2s',
                     '&:hover': { bgcolor: '#B5501F' },
                   }}
                 >
-                  Explore →
+                  Find Brands →
                 </Box>
               </Box>
 
-              {/* Mobile nav — simplified */}
-              <Box
-                sx={{
-                  display: { xs: 'flex', md: 'none' },
-                  gap: 2,
-                  alignItems: 'center',
-                }}
-              >
-                {NAV_LINKS.slice(0, 2).map(({ label, to }) => (
+              {/* Mobile nav */}
+              <Box sx={{ display: { xs: 'flex', md: 'none' }, gap: 2, alignItems: 'center' }}>
+                {[NAV_LINKS[1], NAV_LINKS[2], NAV_LINKS[3]].map(({ label, to }) => (
                   <Box
                     key={to}
                     component={Link}
                     to={to}
                     sx={{
-                      fontFamily: fonts.sans,
-                      fontSize: '0.8125rem',
-                      fontWeight: 600,
+                      fontFamily: fonts.sans, fontSize: '0.8125rem', fontWeight: 600,
                       color: isActive(to) ? colors.ridgeline : 'rgba(255,255,255,0.75)',
-                      textDecoration: 'none',
-                      '&:hover': { color: '#FFFFFF' },
+                      textDecoration: 'none', '&:hover': { color: '#FFFFFF' },
                     }}
                   >
                     {label}
                   </Box>
                 ))}
-                <Box
-                  component={Link}
-                  to="/blog"
-                  sx={{
-                    fontFamily: fonts.sans,
-                    fontSize: '0.8125rem',
-                    fontWeight: 600,
-                    color: isActive('/blog') ? colors.ridgeline : 'rgba(255,255,255,0.75)',
-                    textDecoration: 'none',
-                    '&:hover': { color: '#FFFFFF' },
-                  }}
-                >
-                  Blog
-                </Box>
               </Box>
             </Box>
           </Container>
@@ -189,15 +121,7 @@ const Layout = () => {
         </Box>
 
         {/* Footer */}
-        <Box
-          component="footer"
-          sx={{
-            bgcolor: colors.forest,
-            color: 'rgba(255,255,255,0.75)',
-            pt: { xs: 6, md: 8 },
-            pb: { xs: 4, md: 5 },
-          }}
-        >
+        <Box component="footer" sx={{ bgcolor: colors.forest, color: 'rgba(255,255,255,0.75)', pt: { xs: 6, md: 8 }, pb: { xs: 4, md: 5 } }}>
           <Container maxWidth="xl">
             <Box
               sx={{
@@ -209,42 +133,23 @@ const Layout = () => {
                 mb: 4,
               }}
             >
-              {/* Mission */}
               <Box>
-                <Typography
-                  sx={{
-                    fontFamily: fonts.serif,
-                    fontStyle: 'italic',
-                    fontSize: '1.375rem',
-                    color: '#FFFFFF',
-                    lineHeight: 1.4,
-                    mb: 2,
-                    maxWidth: 340,
-                  }}
-                >
-                  "Most gear is made by fewer companies than you'd think. We keep the record."
+                <Typography sx={{ fontFamily: fonts.serif, fontStyle: 'italic', fontSize: '1.375rem', color: '#FFFFFF', lineHeight: 1.4, mb: 2, maxWidth: 340 }}>
+                  "Stories of independent outdoor companies and the people who build them."
                 </Typography>
-                <Typography
-                  sx={{
-                    fontSize: '0.875rem',
-                    color: 'rgba(255,255,255,0.5)',
-                    lineHeight: 1.6,
-                    maxWidth: 300,
-                  }}
-                >
-                  Ownership records, acquisition histories, and sustainability data for the outdoor industry.
+                <Typography sx={{ fontSize: '0.875rem', color: 'rgba(255,255,255,0.5)', lineHeight: 1.6, maxWidth: 300 }}>
+                  Founder profiles, brand discovery, and a free directory of who owns what in outdoor gear.
                 </Typography>
               </Box>
 
-              {/* Explore */}
               <Box>
                 <Typography sx={{ fontFamily: fonts.mono, fontSize: '0.6875rem', letterSpacing: '0.12em', textTransform: 'uppercase', color: colors.ridgeline, mb: 2 }}>
-                  Explore
+                  Discover
                 </Typography>
                 {[
-                  { label: 'Company Directory', to: '/directory' },
+                  { label: 'Independent Brands', to: '/directory' },
                   { label: 'Ownership Map', to: '/ownership-map' },
-                  { label: 'Blog', to: '/blog' },
+                  { label: 'Stories', to: '/blog' },
                 ].map(({ label, to }) => (
                   <Box key={to} component={Link} to={to} sx={{ display: 'block', color: 'rgba(255,255,255,0.6)', textDecoration: 'none', fontSize: '0.9rem', mb: 1, '&:hover': { color: '#FFFFFF' }, transition: 'color 0.2s' }}>
                     {label}
@@ -252,14 +157,12 @@ const Layout = () => {
                 ))}
               </Box>
 
-              {/* About */}
               <Box>
                 <Typography sx={{ fontFamily: fonts.mono, fontSize: '0.6875rem', letterSpacing: '0.12em', textTransform: 'uppercase', color: colors.ridgeline, mb: 2 }}>
                   Project
                 </Typography>
                 {[
                   { label: 'About', to: '/about' },
-                  { label: 'Methodology', to: '/about' },
                   { label: 'Submit a Company', to: '/submit' },
                 ].map(({ label, to }) => (
                   <Box key={label} component={Link} to={to} sx={{ display: 'block', color: 'rgba(255,255,255,0.6)', textDecoration: 'none', fontSize: '0.9rem', mb: 1, '&:hover': { color: '#FFFFFF' }, transition: 'color 0.2s' }}>
@@ -268,7 +171,6 @@ const Layout = () => {
                 ))}
               </Box>
 
-              {/* Ownership Legend */}
               <Box>
                 <Typography sx={{ fontFamily: fonts.mono, fontSize: '0.6875rem', letterSpacing: '0.12em', textTransform: 'uppercase', color: colors.ridgeline, mb: 2 }}>
                   Ownership Key
@@ -289,7 +191,7 @@ const Layout = () => {
 
             <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: 2 }}>
               <Typography sx={{ fontFamily: fonts.mono, fontSize: '0.75rem', color: 'rgba(255,255,255,0.35)', letterSpacing: '0.05em' }}>
-                © {new Date().getFullYear()} Indie Outdoors · Built on the trail
+                © {new Date().getFullYear()} Indie Outdoors
               </Typography>
               <Typography sx={{ fontFamily: fonts.mono, fontSize: '0.75rem', color: 'rgba(255,255,255,0.35)', letterSpacing: '0.05em' }}>
                 Open source · GitHub Pages
