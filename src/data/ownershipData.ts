@@ -320,7 +320,7 @@ export const OWNERSHIP_GROUPS: OwnershipGroup[] = [
       { name: 'Cotopaxi', founded: 2014 },
       { name: 'KÜHL', founded: 1983 },
       { name: 'Outdoor Research', founded: 1981 },
-      { name: 'Darn Tough', founded: 1978 },
+      { name: 'Darn Tough Vermont', founded: 2004, note: '100% family-owned in Northfield, VT. Unconditional lifetime guarantee. Has turned down multiple acquisition offers.' },
       { name: 'Big Agnes', founded: 2000 },
       { name: 'Petzl', founded: 1975 },
       { name: 'La Sportiva', founded: 1928 },
