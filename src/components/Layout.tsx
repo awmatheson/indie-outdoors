@@ -44,10 +44,9 @@ const Layout = () => {
               >
                 <Box
                   component="img"
-                  src="/indie-outdoors/indie-outdoors.svg"
+                  src="/indie-outdoors/favicon-dark.ico"
                   alt="Indie Outdoors"
-                  sx={{ height: 28, width: 28, filter: 'brightness(0) invert(1) opacity(0.9)' }}
-                  onError={(e) => { (e.target as HTMLImageElement).style.display = 'none'; }}
+                  sx={{ height: 32, width: 32 }}
                 />
                 <Typography sx={{ fontFamily: fonts.serif, fontSize: { xs: '1.0625rem', md: '1.125rem' }, color: '#FFFFFF', letterSpacing: '0.01em', fontStyle: 'italic', lineHeight: 1 }}>
                   Indie Outdoors
