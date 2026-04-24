@@ -45,6 +45,7 @@ OWNERSHIP_STATUS_VALUES = [
     "Independent - Family Owned",
     "Independent - Founder Owned",
     "Independent - Employee Owned",
+    "Founder-Led - Venture Backed",   # founder still runs it; VC/growth equity investors hold minority stake
     "Private - Family Owned",
     "Private Equity Owned",
     "Public Company",
