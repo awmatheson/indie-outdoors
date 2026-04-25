@@ -6,15 +6,15 @@ import { fetchSubstackPosts, SUBSTACK_BASE_URL, type SubstackPost } from '../uti
 
 // ── Featured spotlight ──────────────────────────────────────────
 const SPOTLIGHT = {
-  eyebrow: 'Made in Maine',
-  name: 'Hyperlite Mountain Gear',
-  slug: 'hyperlite-mountain-gear',
-  location: 'Biddeford, Maine',
-  founded: '2010',
-  category: 'Packs & Shelters',
+  eyebrow: 'Made in Nevada',
+  name: 'Moment Skis',
+  slug: 'moment-skis',
+  location: 'Reno, Nevada',
+  founded: '2003',
+  category: 'Skis',
   description:
-    'Mike St. Pierre spent years frustrated by packs that were either light but fragile or durable but heavy. He started Hyperlite in a barn in Maine and figured out how to use Dyneema — a fiber originally engineered for racing yacht sails — to make packs that are both. Still made in Biddeford, still independent.',
-  tags: ['Independent', 'Made in USA', 'Ultralight'],
+    'Sterling Welker and Derek Stern were pro skiers who couldn\'t find skis that performed the way they skied. So they built a factory in Reno, Nevada — now the largest ski manufacturing operation in the United States — and started making them. Over 20 years later, still independent, still building every ski in-house.',
+  tags: ['Independent', 'Made in USA', 'Founder Owned'],
 };
 
 // ── Category browse ─────────────────────────────────────────────
@@ -172,9 +172,9 @@ export default function Homepage() {
                 Why it matters
               </Typography>
               {[
-                { stat: 'Made in USA', note: 'Every pack and shelter built in Biddeford, Maine' },
-                { stat: 'Dyneema®', note: 'Same fiber used in offshore racing yacht sails' },
-                { stat: 'Independent', note: 'No outside investors. No corporate parent.' },
+                { stat: 'Made in USA', note: 'Every ski built in their Reno, Nevada factory' },
+                { stat: 'Largest US Factory', note: 'Biggest ski manufacturing operation in America' },
+                { stat: 'Independent', note: 'Founder-owned. No outside investors.' },
               ].map(({ stat, note }) => (
                 <Box key={stat} sx={{ mb: 3, pb: 3, borderBottom: `1px solid rgba(196,168,130,0.15)`, '&:last-child': { mb: 0, pb: 0, borderBottom: 'none' } }}>
                   <Typography sx={{ fontFamily: fonts.mono, fontWeight: 600, fontSize: '1rem', color: colors.ridgeline, mb: 0.5 }}>
